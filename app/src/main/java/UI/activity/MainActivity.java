@@ -1,12 +1,11 @@
-package UI.activity;
+package ui.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.FrameLayout;
 
 import com.googlemapdemo.R;
 
-import UI.fragment.Fragment_tracker;
+import ui.fragment.Fragment_tracker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,9 +13,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        getSupportFragmentManager().beginTransaction().add(R.id.container,new Fragment_tracker()).commit();
+        if(savedInstanceState==null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new Fragment_tracker()).commit();
+        }
 
     }
 }
