@@ -214,13 +214,13 @@ public class GPSTracker extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Toast.makeText(mContext, "Your Location is - \nLat: " + location.getLatitude() + "\nLong: " + location.getLongitude(), Toast.LENGTH_LONG).show();
-        Log.e("LOCATION","CHANGED");
+        //Log.e("LOCATION","CHANGED");
     }
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
         //Broad Cast the event
-        Log.e("STATUS","CHANGED");
+        //Log.e("STATUS","CHANGED");
     }
 
     @Override
