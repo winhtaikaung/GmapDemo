@@ -18,10 +18,14 @@ public class Db_helper {
 
     }
 
+    /**
+     * <p>Returns Arrays of Visited Lat Lon that user saved</p>
+     * */
     public  String[] getAllDestination(){
-        //String destination=PreferenceHelper.getString(mContext,PreferenceHelper.LOCATION,"");
+        String destination=PreferenceHelper.getInstance(mContext).getStringPreference(PreferenceHelper.LOCATION,"");
+        String[] sList=destination.split(",");
 
-        return new String[0];
+        return sList;
     }
 
     public  void addDestination(String location){

@@ -1,12 +1,12 @@
 package ui.fragment;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,20 +19,24 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.googlemapdemo.R;
 
-import java.util.Arrays;
-
 import helpers.Db_helper;
+
+import listenersInterface.IGPSChangeListener;
 import ui.services.GPSTracker;
 
 /**
  * Created by winhtaikaung on 2/13/16.
  */
-public class Fragment_tracker extends Fragment implements OnMapReadyCallback {
+public class Fragment_tracker extends Fragment implements OnMapReadyCallback,IGPSChangeListener {
 
     FloatingActionButton btn_save;
     CoordinatorLayout coordinatorLayout;
     SupportMapFragment mapFragment;
     GPSTracker gpsTracker;
+
+
+
+
 
     Db_helper db;
 
@@ -43,6 +47,8 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback {
         View view=inflater.inflate(R.layout.fragment_tracker,container,false);
         mapFragment=(SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         db=new Db_helper(getActivity());
+
+
 
         bindView(view);
         bindAction();
@@ -66,12 +72,12 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStart() {
         super.onStart();
-        gpsTracker=new GPSTracker(getActivity());
+        gpsTracker=new GPSTracker(getActivity(),this,mapFragment.getMap());
         if(gpsTracker.canGetLocation()){
 
 
             // \n is for new line
-            Toast.makeText(getActivity(), "Your Location is - \nLat: " + gpsTracker.getLatitude() + "\nLong: " + gpsTracker.getLongitude(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), "Your Location is - \nLat: " + gpsTracker.getLatitude() + "\nLong: " + gpsTracker.getLongitude(), Toast.LENGTH_LONG).show();
         }else{
             // can't get location
             // GPS or Network is not enabled
@@ -102,6 +108,31 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback {
 
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(gpsTracker.canGetLocation()){
+
+
+            // \n is for new line
+            // Toast.makeText(getActivity(), "Your Location is - \nLat: " + gpsTracker.getLatitude() + "\nLong: " + gpsTracker.getLongitude(), Toast.LENGTH_LONG).show();
+        }else{
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gpsTracker.showSettingsAlert();
+        }
+    }
+
+    @Override
+    public void OnUserMove(Location l, Fragment mFragment, GoogleMap map) {
+        Toast.makeText(getActivity(), "My Location is - \nLat: " + l.getLatitude() + "\nLong: " + l.getLongitude(), Toast.LENGTH_LONG).show();
+        LatLng movelatlng=new LatLng(l.getLatitude(),l.getLongitude());
+        map.moveCamera(CameraUpdateFactory.newLatLng(movelatlng));
+    }
+
     protected class OnButtonClickListener implements View.OnClickListener{
 
         @Override
@@ -119,21 +150,6 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(gpsTracker.canGetLocation()){
-
-
-            // \n is for new line
-            // Toast.makeText(getActivity(), "Your Location is - \nLat: " + gpsTracker.getLatitude() + "\nLong: " + gpsTracker.getLongitude(), Toast.LENGTH_LONG).show();
-        }else{
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            gpsTracker.showSettingsAlert();
-        }
-    }
 
 
 

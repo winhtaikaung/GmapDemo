@@ -14,9 +14,13 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+
+import listenersInterface.IGPSChangeListener;
 
 /**
  * Created by winhtaikaung on 2/13/16.
@@ -46,9 +50,13 @@ public class GPSTracker extends Service implements LocationListener {
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
+    protected Fragment mFragment;
+    protected GoogleMap mMap;
 
-    public GPSTracker(Context context) {
+    public GPSTracker(Context context, Fragment f,GoogleMap map) {
         this.mContext = context;
+        this.mFragment=f;
+        this.mMap=map;
         getLocation();
     }
 
@@ -145,6 +153,12 @@ public class GPSTracker extends Service implements LocationListener {
         return longitude;
     }
 
+    public void broadcastIntent(){
+        Intent intent = new Intent();
+        intent.setAction("LOCATION_CHANGE");
+        mContext.sendBroadcast(intent);
+    }
+
     /**
      * Function to check if best network provider
      * @return boolean
@@ -213,9 +227,14 @@ public class GPSTracker extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(mContext, "Your Location is - \nLat: " + location.getLatitude() + "\nLong: " + location.getLongitude(), Toast.LENGTH_LONG).show();
+        IGPSChangeListener igps=(IGPSChangeListener) mFragment;
+       // Toast.makeText(mContext, "Your Location is - \nLat: " + location.getLatitude() + "\nLong: " + location.getLongitude(), Toast.LENGTH_LONG).show();
         //Log.e("LOCATION","CHANGED");
+        igps.OnUserMove(location,mFragment,mMap);
+        broadcastIntent();
     }
+
+
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
@@ -238,6 +257,9 @@ public class GPSTracker extends Service implements LocationListener {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+
+
 }
 
 
