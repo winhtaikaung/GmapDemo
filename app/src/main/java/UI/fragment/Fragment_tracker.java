@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,7 +31,7 @@ import ui.services.GPSTracker;
 /**
  * Created by winhtaikaung on 2/13/16.
  */
-public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IGPSChangeListener,GoogleApiClient.ConnectionCallbacks,
+public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IGPSChangeListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     FloatingActionButton btn_save;
@@ -63,14 +62,20 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         db = new Db_helper(getActivity());
 
 
+        if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
+            GooglePlayHelper.buildAlertMessageNoGps(getActivity());
+        }
+
+
         bindView(view);
         bindAction();
+
 
         if (GooglePlayHelper.isPlayServiceAvailable(getActivity())) {
 
             // Building the GoogleApi client
             buildGoogleApiClient();
-        }else{
+        } else {
 
         }
 
@@ -101,16 +106,23 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
             mGoogleApiClient.connect();
         }
 
+
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        if(GooglePlayHelper.isPlayServiceAvailable(getActivity())){
+        gpsTracker = new GPSTracker(getActivity(), this
+                , googleMap);
+
+        if (GooglePlayHelper.isPlayServiceAvailable(getActivity())) {
 
             displayLocationbyPlayservice();
 
-        }else {
+        } else {
+
+
             if (gpsTracker.canGetLocation()) {
                 LatLng location = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
 
@@ -122,7 +134,8 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
             } else {
                 //if GPS couldn't load last known location it will load from Playservice
                 //LocationServices.FusedLocationApi.getLastLocation()
-                gpsTracker.showSettingsAlert();
+                //gpsTracker.showSettingsAlert();
+
             }
         }
     }
@@ -140,9 +153,23 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
             mapFragment.getMap().setMyLocationEnabled(true);
             mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
 
+        } else {
+            if (gpsTracker.canGetLocation()) {
+                LatLng location = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+
+                mapFragment.getMap().setMyLocationEnabled(true);
+                mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
+
+                //} else {
+
+            } else {
+                //if GPS couldn't load last known location it will load from Playservice
+                //LocationServices.FusedLocationApi.getLastLocation()
+                //gpsTracker.showSettingsAlert();
+
+            }
         }
     }
-
 
 
     @Override
@@ -156,7 +183,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     @Override
     public void onResume() {
         super.onResume();
-
+        if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
+            GooglePlayHelper.buildAlertMessageNoGps(getActivity());
+        }
         GooglePlayHelper.isPlayServiceAvailable(getActivity());
     }
 
@@ -185,7 +214,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
     /**
      * Creating google api client object
-     * */
+     */
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
