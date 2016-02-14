@@ -2,13 +2,10 @@ package ui.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.googlemapdemo.R;
 
-import java.util.Arrays;
-
-import ui.fragment.Fragment_tracker;
+import ui.fragment.Fragment_tabpager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(savedInstanceState==null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new Fragment_tracker()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new Fragment_tabpager()).commit();
         }
 
     }
