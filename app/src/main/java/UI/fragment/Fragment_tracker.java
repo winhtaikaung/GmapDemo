@@ -227,7 +227,24 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btn_save:
-                    db.addDestination(gpsTracker.getLongitude() + "|" + gpsTracker.getLatitude());
+
+                    mLastLocation = LocationServices.FusedLocationApi
+                            .getLastLocation(mGoogleApiClient);
+                    if (mLastLocation != null) {
+                        //Get Location From Google Play Service
+                        double latitude = mLastLocation.getLatitude();
+                        double longitude = mLastLocation.getLongitude();
+                        db.addDestination(latitude + "-" + longitude);
+                    }else{
+                        //Fall Back situation
+                        if(gpsTracker.getLocation()!=null){
+                            double latitude = gpsTracker.getLatitude();
+                            double longitude = gpsTracker.getLongitude();
+                            db.addDestination(latitude + "-" + longitude);
+                        }
+                    }
+
+
 
                     Snackbar snackbar = Snackbar
                             .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);

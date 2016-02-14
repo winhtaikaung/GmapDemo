@@ -3,6 +3,7 @@ package adapters;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,11 +46,13 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
     @Override
     public void onBindViewHolder(HistoryViewHolder holder, int position) {
-        String lat=mArrString[position].split("|")[0];
-        String lon=mArrString[position].split("|")[1];
+        String[] lat_lon=mArrString[position].split("-");
 
-        holder.tv_lat.setText(lat);
-        holder.tv_lon.setText(lon);
+        Log.e("LAT_LON",lat_lon[0]);
+        Log.e("LAT_LON",lat_lon[1]);
+
+        holder.tv_lat.setText(lat_lon[0]);
+        holder.tv_lon.setText(lat_lon[1]);
     }
 
     @Override
