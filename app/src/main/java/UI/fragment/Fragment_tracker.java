@@ -1,5 +1,6 @@
 package ui.fragment;
 
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.googlemapdemo.R;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import helpers.Dbhelper;
 import helpers.GooglePlayHelper;
@@ -60,6 +67,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         View view = inflater.inflate(R.layout.fragment_tracker, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         db = new Dbhelper(getActivity());
+
 
 
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
@@ -139,9 +147,32 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         }
     }
 
+    boolean checkduplicate(String latlon){
+        String[] arr_destination=db.getAllDestination();
+        List list=Arrays.asList(arr_destination);
+        int index=Collections.binarySearch(list,latlon);
+        if(index==-1){
+            return false;
+        }else{
+            AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
+            dialog.setMessage("Duplicate Location!");
+            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            dialog.show();
+            return true;
+        }
+
+    }
+
     void displayLocationbyPlayservice() {
         mLastLocation = LocationServices.FusedLocationApi
                 .getLastLocation(mGoogleApiClient);
+
+
         if (mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
@@ -230,26 +261,36 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
                     mLastLocation = LocationServices.FusedLocationApi
                             .getLastLocation(mGoogleApiClient);
+
                     if (mLastLocation != null) {
                         //Get Location From Google Play Service
                         double latitude = mLastLocation.getLatitude();
                         double longitude = mLastLocation.getLongitude();
-                        db.addDestination(latitude + "-" + longitude);
+                        if(!checkduplicate(latitude + ":" + longitude)) {
+                            db.addDestination(latitude + ":" + longitude);
+                            Snackbar snackbar = Snackbar
+                                    .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
+
+                            snackbar.show();
+                        }
                     }else{
                         //Fall Back situation
                         if(gpsTracker.getLocation()!=null){
                             double latitude = gpsTracker.getLatitude();
                             double longitude = gpsTracker.getLongitude();
-                            db.addDestination(latitude + "-" + longitude);
+                            if(!checkduplicate(latitude + ":" + longitude)) {
+                                db.addDestination(latitude + ":" + longitude);
+                                Snackbar snackbar = Snackbar
+                                        .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
+
+                                snackbar.show();
+                            }
                         }
                     }
 
 
 
-                    Snackbar snackbar = Snackbar
-                            .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
 
-                    snackbar.show();
                     break;
             }
         }

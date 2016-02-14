@@ -46,7 +46,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
     @Override
     public void onBindViewHolder(HistoryViewHolder holder, int position) {
-        String[] lat_lon=mArrString[position].split("-");
+        String[] lat_lon=mArrString[position].split(":");
 
         Log.e("LAT_LON",lat_lon[0]);
         Log.e("LAT_LON",lat_lon[1]);

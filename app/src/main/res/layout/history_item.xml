@@ -7,23 +7,47 @@
     android:layout_marginRight="5dp"
     android:layout_marginTop="5dp">
 
-<LinearLayout
+<RelativeLayout
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
 
+    android:layout_height="match_parent">
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:text="Latitude"
+
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tv_lat"
+        android:layout_alignBottom="@+id/tv_lat"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
+    <TextView
+        android:layout_width="wrap_content"
         android:id="@+id/tv_lat"
         android:text="latitude"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tv_lon"
+        android:layout_alignLeft="@+id/tv_lon"
+        android:layout_alignStart="@+id/tv_lon" />
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:text="Longitude"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <TextView
+        android:layout_width="wrap_content"
         android:id="@+id/tv_lon"
         android:text="longitude"
         android:layout_height="wrap_content"
-         />
-</LinearLayout>
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/textView"
+        android:layout_toEndOf="@+id/textView" />
+</RelativeLayout>
 
 
 
