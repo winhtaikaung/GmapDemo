@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * Created by winhtaikaung on 2/13/16.
  */
-public class Db_helper {
+public class Dbhelper {
     Context mContext;
-    public Db_helper(Context c){
+    public Dbhelper(Context c){
         this.mContext=c;
 
     }
@@ -23,9 +23,14 @@ public class Db_helper {
      * */
     public  String[] getAllDestination(){
         String destination=PreferenceHelper.getInstance(mContext).getStringPreference(PreferenceHelper.LOCATION,"");
-        String[] sList=destination.split(",");
+        if(destination.equals("")){
+            return new String[0];
+        }else{
+            return destination.split(",");
+        }
 
-        return sList;
+
+
     }
 
     public  void addDestination(String location){

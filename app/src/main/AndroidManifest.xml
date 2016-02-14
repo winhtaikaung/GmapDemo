@@ -28,6 +28,13 @@
         <service android:name="ui.services.GPSTracker">
 
         </service>
+
+        <receiver android:name=".Re">
+            <intent-filter>
+                <action android:name="com.tutorialspoint.CUSTOM_INTENT">
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

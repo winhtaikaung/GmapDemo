@@ -23,7 +23,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.googlemapdemo.R;
 
-import helpers.Db_helper;
+import helpers.Dbhelper;
 import helpers.GooglePlayHelper;
 import listenersInterface.IGPSChangeListener;
 import ui.services.GPSTracker;
@@ -51,7 +51,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     private static int DISPLACEMENT = 10; // 10 meters
 
     GPSTracker gpsTracker;
-    Db_helper db;
+    Dbhelper db;
 
 
     @Nullable
@@ -59,7 +59,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tracker, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        db = new Db_helper(getActivity());
+        db = new Dbhelper(getActivity());
 
 
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
@@ -72,7 +72,6 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
 
         if (GooglePlayHelper.isPlayServiceAvailable(getActivity())) {
-
             // Building the GoogleApi client
             buildGoogleApiClient();
         } else {
@@ -239,5 +238,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         }
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        gpsTracker.stopUsingGPS();
+    }
 }

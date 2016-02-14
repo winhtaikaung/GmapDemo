@@ -3,6 +3,7 @@ package adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 
 import ui.fragment.Fragment_history;
 import ui.fragment.Fragment_tracker;
@@ -12,8 +13,12 @@ import ui.fragment.Fragment_tracker;
  */
 public class TabsPagerAdapter extends FragmentPagerAdapter {
     String[] mtitles;
+    FragmentManager fragManager;
+    FragmentTransaction ft;
     public TabsPagerAdapter(FragmentManager fm,String[] titles) {
         super(fm);
+        this.fragManager=fm;
+        this.ft=fragManager.beginTransaction();
 
         this.mtitles=titles;
     }
@@ -26,6 +31,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
                 return new Fragment_tracker();
 
             case 1:
+
                 return new Fragment_history();
 
 
