@@ -17,9 +17,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 
+import helpers.ConnectionHelper;
 import listenersInterface.IGPSChangeListener;
 
 /**
@@ -52,6 +56,7 @@ public class GPSTracker extends Service implements LocationListener {
     protected LocationManager locationManager;
     protected Fragment mFragment;
     protected GoogleMap mMap;
+    GoogleApiClient mGoogleApiClient;
 
     public GPSTracker(Context context, Fragment f,GoogleMap map) {
         this.mContext = context;
@@ -73,8 +78,11 @@ public class GPSTracker extends Service implements LocationListener {
             isNetworkEnabled = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+
+
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no network provider is enabled
+
             } else {
                 this.canGetLocation = true;
                 // First get location from Network Provider
@@ -123,6 +131,9 @@ public class GPSTracker extends Service implements LocationListener {
                         }
                     }
                 }
+
+
+
             }
 
         } catch (Exception e) {
@@ -257,6 +268,7 @@ public class GPSTracker extends Service implements LocationListener {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 
 
 
