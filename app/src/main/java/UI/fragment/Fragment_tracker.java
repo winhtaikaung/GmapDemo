@@ -213,9 +213,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     @Override
     public void onResume() {
         super.onResume();
-        if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
-            GooglePlayHelper.buildAlertMessageNoGps(getActivity());
-        }
+
         GooglePlayHelper.isPlayServiceAvailable(getActivity());
     }
 
@@ -296,9 +294,5 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        gpsTracker.stopUsingGPS();
-    }
+
 }
