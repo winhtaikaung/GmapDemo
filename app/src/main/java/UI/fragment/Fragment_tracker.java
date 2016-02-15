@@ -82,7 +82,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
             buildAlertMessageNoGps(getActivity());
         }
-
+        // Asking for Permissions to grab Location
         AndroidPermissions.check(getActivity())
                 .permissions(Manifest.permission.ACCESS_FINE_LOCATION)
                 .hasPermissions(new Checker.Action0() {
@@ -90,9 +90,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                     public void call(String[] permissions) {
                         String msg = "Permission has " + permissions[0];
                         Log.d(TAG, msg);
-                        Toast.makeText(getActivity(),
+                        /*Toast.makeText(getActivity(),
                                 msg,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT).show();*/
 
 
 
@@ -103,9 +103,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                     public void call(String[] permissions) {
                         String msg = "Permission has no " + permissions[0];
                         Log.d(TAG, msg);
-                        Toast.makeText(getActivity(),
+                        /*Toast.makeText(getActivity(),
                                 msg,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT).show();*/
 
                         ActivityCompat.requestPermissions(getActivity()
                                 , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}
@@ -140,9 +140,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                     @Override
                     public void call() {
                         String msg = "Request Success : " + permissions[0];
-                        Toast.makeText(getActivity(),
+                        /*Toast.makeText(getActivity(),
                                 msg,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT).show();*/
 
                             displayLocationbyPlayservice();
 
@@ -152,9 +152,10 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                     @Override
                     public void call(String[] hasPermissions, String[] noPermissions) {
                         String msg = "Request Fail : " + noPermissions[0];
-                        Toast.makeText(getActivity(),
+                        /*Toast.makeText(getActivity(),
                                 msg,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT).show();*/
+
 
                     }
                 })
