@@ -1,18 +1,24 @@
 package ui.fragment;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,6 +30,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.googlemapdemo.R;
+import com.nobrain.android.permissions.AndroidPermissions;
+import com.nobrain.android.permissions.Checker;
+import com.nobrain.android.permissions.Result;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,6 +56,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     SupportMapFragment mapFragment;
     GoogleApiClient mGoogleApiClient;
 
+    public static final int REQUEST_CODE = 102;
+    private static final String TAG = "";
+
 
     private boolean mRequestingLocationUpdates = false;
 
@@ -67,12 +79,41 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         View view = inflater.inflate(R.layout.fragment_tracker, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         db = new Dbhelper(getActivity());
-
-
-
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
-            GooglePlayHelper.buildAlertMessageNoGps(getActivity());
+            buildAlertMessageNoGps(getActivity());
         }
+
+        AndroidPermissions.check(getActivity())
+                .permissions(Manifest.permission.ACCESS_FINE_LOCATION)
+                .hasPermissions(new Checker.Action0() {
+                    @Override
+                    public void call(String[] permissions) {
+                        String msg = "Permission has " + permissions[0];
+                        Log.d(TAG, msg);
+                        Toast.makeText(getActivity(),
+                                msg,
+                                Toast.LENGTH_SHORT).show();
+
+
+
+                    }
+                })
+                .noPermissions(new Checker.Action1() {
+                    @Override
+                    public void call(String[] permissions) {
+                        String msg = "Permission has no " + permissions[0];
+                        Log.d(TAG, msg);
+                        Toast.makeText(getActivity(),
+                                msg,
+                                Toast.LENGTH_SHORT).show();
+
+                        ActivityCompat.requestPermissions(getActivity()
+                                , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}
+                                , REQUEST_CODE);
+                    }
+                })
+                .check();
+
 
 
         bindView(view);
@@ -89,6 +130,35 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
         mapFragment.getMapAsync(this);
         return view;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, final @NonNull String[] permissions, @NonNull int[] grantResults) {
+        AndroidPermissions.result(getActivity())
+                .addPermissions(REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION)
+                .putActions(REQUEST_CODE, new Result.Action0() {
+                    @Override
+                    public void call() {
+                        String msg = "Request Success : " + permissions[0];
+                        Toast.makeText(getActivity(),
+                                msg,
+                                Toast.LENGTH_SHORT).show();
+
+                            displayLocationbyPlayservice();
+
+
+                    }
+                }, new Result.Action1() {
+                    @Override
+                    public void call(String[] hasPermissions, String[] noPermissions) {
+                        String msg = "Request Fail : " + noPermissions[0];
+                        Toast.makeText(getActivity(),
+                                msg,
+                                Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .result(requestCode, permissions, grantResults);
     }
 
     void bindView(View v) {
@@ -184,6 +254,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
             mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(location, 13));
 
         } else {
+            gpsTracker=new GPSTracker(getActivity(),this,mapFragment.getMap());
             if (gpsTracker.canGetLocation()) {
                 LatLng location = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
 
@@ -213,8 +284,9 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     @Override
     public void onResume() {
         super.onResume();
+        displayLocationbyPlayservice();
 
-        GooglePlayHelper.isPlayServiceAvailable(getActivity());
+
     }
 
     @Override
@@ -226,6 +298,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
     @Override
     public void onConnected(Bundle bundle) {
+
         displayLocationbyPlayservice();
     }
 
@@ -292,6 +365,27 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                     break;
             }
         }
+    }
+    public  void buildAlertMessageNoGps(final Activity activity) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(activity.getResources().getString(R.string.msg_gps_alert))
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        activity.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+
+                        dialog.cancel();
+                        getActivity().finish();
+
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
 
