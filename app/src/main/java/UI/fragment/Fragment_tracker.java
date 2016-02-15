@@ -219,23 +219,17 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     }
 
     boolean checkduplicate(String latlon){
+        boolean duplicate=false;
         String[] arr_destination=db.getAllDestination();
         List list=Arrays.asList(arr_destination);
         int index=Collections.binarySearch(list,latlon);
         if(index==-1){
-            return false;
-        }else{
-            AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
-            dialog.setMessage("Duplicate Location!");
-            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
-            dialog.show();
-            return true;
+            duplicate= false;
+        }else if(index>-1){
+
+            duplicate= true;
         }
+        return duplicate;
 
     }
 
@@ -292,7 +286,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
 
     @Override
     public void OnUserMove(Location l, Fragment mFragment, GoogleMap map) {
-        //Toast.makeText(getActivity(), "My Location is - \nLat: " + l.getLatitude() + "\nLong: " + l.getLongitude(), Toast.LENGTH_LONG).show();
+
         db=new Dbhelper(getActivity());
         if(!db.getLastDestination().equals("")){
             String[]last_location=db.getLastDestination().split(":");
@@ -301,9 +295,25 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
             lasLocation.setLongitude(Double.parseDouble(last_location[1]));
 
 
-
-
             Log.e("Distance",String.valueOf(GooglePlayHelper.calculateDistance(lasLocation,l)));
+            if(GooglePlayHelper.calculateDistance(lasLocation,l)<=1000){
+
+                //Calculating the User location By Current Location
+                if(checkduplicate(l.getLatitude()+":"+l.getLongitude())){
+                    AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
+                    dialog.setMessage("You have been this place within 1 Km");
+                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    dialog.show();
+                }
+
+            }
+
+
         }
 
         LatLng movelatlng = new LatLng(l.getLatitude(), l.getLongitude());
@@ -357,6 +367,16 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                                     .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
 
                             snackbar.show();
+                        }else{
+                            AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
+                            dialog.setMessage("Duplicate Location is not allowed to Save");
+                            dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                            dialog.show();
                         }
                     }else{
                         //Fall Back situation
@@ -369,6 +389,16 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                                         .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
 
                                 snackbar.show();
+                            }else{
+                                AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
+                                dialog.setMessage("Duplicate Location is not allowed to Save");
+                                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                                dialog.show();
                             }
                         }
                     }
