@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.googlemapdemo.R;
+
+import java.util.Locale;
 
 import adapters.HistoryListAdapter;
 import helpers.Dbhelper;
@@ -63,7 +66,7 @@ public class Fragment_history extends Fragment {
 
 
 
-        historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity());
+        historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity(),new Geocoder(getActivity(), Locale.getDefault()));
         mHistoryList.setAdapter(historyListAdapter);
         historyListAdapter.notifyDataSetChanged();
     }
@@ -73,8 +76,7 @@ public class Fragment_history extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("history")) {
                 if(db.getAllDestination().length!=0) {
-                    historyListAdapter = new HistoryListAdapter(db.getAllDestination(), getActivity());
-                    mHistoryList=(RecyclerView)v.findViewById(R.id.history_list) ;
+                    historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity(), new Geocoder(getActivity(), Locale.getDefault()));
                     layoutManager = new LinearLayoutManager(getActivity());
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                     mHistoryList.setLayoutManager(layoutManager);

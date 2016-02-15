@@ -8,4 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TV_CAPTION" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorBlack</item>
+
+        <item name="android:textSize">20dp</item>
+        <item name="fontPath">fonts/RobotoCondensed-Regular.ttf</item>
+    </style>
+
 </resources>
