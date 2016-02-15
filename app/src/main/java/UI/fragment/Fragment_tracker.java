@@ -293,6 +293,19 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     @Override
     public void OnUserMove(Location l, Fragment mFragment, GoogleMap map) {
         //Toast.makeText(getActivity(), "My Location is - \nLat: " + l.getLatitude() + "\nLong: " + l.getLongitude(), Toast.LENGTH_LONG).show();
+        db=new Dbhelper(getActivity());
+        if(!db.getLastDestination().equals("")){
+            String[]last_location=db.getLastDestination().split(":");
+            Location lasLocation=new Location("lastLocation");
+            lasLocation.setLatitude(Double.parseDouble(last_location[0]));
+            lasLocation.setLongitude(Double.parseDouble(last_location[1]));
+
+
+
+
+            Log.e("Distance",String.valueOf(GooglePlayHelper.calculateDistance(lasLocation,l)));
+        }
+
         LatLng movelatlng = new LatLng(l.getLatitude(), l.getLongitude());
         map.moveCamera(CameraUpdateFactory.newLatLng(movelatlng));
     }

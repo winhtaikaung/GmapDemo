@@ -32,6 +32,18 @@ public class Dbhelper {
 
 
     }
+    public  String getLastDestination(){
+        String destination=PreferenceHelper.getInstance(mContext).getStringPreference(PreferenceHelper.LOCATION,"");
+        if(destination.equals("")){
+            return "";
+        }else{
+            String[] last= destination.split(",");
+            return last[last.length-1];
+        }
+
+
+
+    }
 
     public  void addDestination(String location){
         // add destination to string array and set it to preference
