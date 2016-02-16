@@ -88,6 +88,11 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
             buildAlertMessageNoGps(getActivity());
         }
+
+        if (GooglePlayHelper.isPlayServiceAvailable(getActivity())) {
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+        }
         // Asking for Permissions to grab Location
         AndroidPermissions.check(getActivity())
                 .permissions(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -126,12 +131,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         bindAction();
 
 
-        if (GooglePlayHelper.isPlayServiceAvailable(getActivity())) {
-            // Building the GoogleApi client
-            buildGoogleApiClient();
-        } else {
 
-        }
 
 
         mapFragment.getMapAsync(this);
@@ -350,6 +350,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
+
                 .addApi(LocationServices.API).build();
     }
 
