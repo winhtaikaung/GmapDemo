@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,10 +36,12 @@ import com.nobrain.android.permissions.AndroidPermissions;
 import com.nobrain.android.permissions.Checker;
 import com.nobrain.android.permissions.Result;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import helpers.Dbhelper;
 import helpers.GooglePlayHelper;
@@ -55,6 +59,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
     Location mLastLocation;
     SupportMapFragment mapFragment;
     GoogleApiClient mGoogleApiClient;
+    Geocoder mGeocoder;
 
     public static final int REQUEST_CODE = 102;
     private static final String TAG = "";
@@ -79,6 +84,7 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
         View view = inflater.inflate(R.layout.fragment_tracker, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         db = new Dbhelper(getActivity());
+        mGeocoder=new Geocoder(getActivity(), Locale.getDefault());
         if (!GooglePlayHelper.isGPSEnabled(getActivity())) {
             buildAlertMessageNoGps(getActivity());
         }
@@ -362,11 +368,29 @@ public class Fragment_tracker extends Fragment implements OnMapReadyCallback, IG
                         double latitude = mLastLocation.getLatitude();
                         double longitude = mLastLocation.getLongitude();
                         if(!checkduplicate(latitude + ":" + longitude)) {
-                            db.addDestination(latitude + ":" + longitude);
-                            Snackbar snackbar = Snackbar
-                                    .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
 
-                            snackbar.show();
+                            List<Address> addresses;
+
+                            try {
+                                addresses = mGeocoder.getFromLocation(latitude, longitude, 1);
+
+                                String address = (addresses.get(0).getAddressLine(0)==null)?"none":addresses.get(0).getAddressLine(0)+" ";
+
+                                String state = (addresses.get(0).getAdminArea()==null)?"":addresses.get(0).getAdminArea()+" ";
+                                String country = (addresses.get(0).getCountryName()==null)?"none":addresses.get(0).getCountryName()+" ";
+                                String postalCode = (addresses.get(0).getPostalCode()==null)?"none":addresses.get(0).getPostalCode();
+                                String fulAddr=address+state+country;
+                                db.addDestination(latitude + ":" + longitude+":"+fulAddr+":"+postalCode);
+                                Snackbar snackbar = Snackbar
+                                        .make(coordinatorLayout, "Your Location Has Been Saved", Snackbar.LENGTH_LONG);
+
+                                snackbar.show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+
                         }else{
                             AlertDialog.Builder dialog=new AlertDialog.Builder(getActivity());
                             dialog.setMessage("Duplicate Location is not allowed to Save");

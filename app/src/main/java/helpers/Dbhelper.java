@@ -22,12 +22,17 @@ public class Dbhelper {
      * <p>Returns Arrays of Visited Lat Lon that user saved</p>
      * */
     public  String[] getAllDestination(){
+        String[] arr=new String[0];
         String destination=PreferenceHelper.getInstance(mContext).getStringPreference(PreferenceHelper.LOCATION,"");
         if(destination.equals("")){
-            return new String[0];
-        }else{
-            return destination.split(",");
+            arr=new String[0];
         }
+
+        if(!destination.equals("")){
+            arr= destination.split(",");
+        }
+
+        return arr;
 
 
 

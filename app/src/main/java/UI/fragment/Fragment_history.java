@@ -37,9 +37,9 @@ public class Fragment_history extends Fragment {
         v=inflater.inflate(R.layout.fragment_history,container,false);
 
         db=new Dbhelper(getActivity());
-        if(db.getAllDestination().length!=0){
+
             bindView(v);
-        }
+
 
 
         return v;
@@ -66,7 +66,7 @@ public class Fragment_history extends Fragment {
 
 
 
-        historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity(),new Geocoder(getActivity(), Locale.getDefault()));
+        historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity());
         mHistoryList.setAdapter(historyListAdapter);
         historyListAdapter.notifyDataSetChanged();
     }
@@ -76,13 +76,17 @@ public class Fragment_history extends Fragment {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("history")) {
                 if(db.getAllDestination().length!=0) {
-                    historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity(), new Geocoder(getActivity(), Locale.getDefault()));
+                    historyListAdapter = new HistoryListAdapter(db.getAllDestination(),getActivity());
                     layoutManager = new LinearLayoutManager(getActivity());
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    mHistoryList.setLayoutManager(layoutManager);
+                    try {
+                        mHistoryList.setLayoutManager(layoutManager);
 
-                    mHistoryList.setAdapter(historyListAdapter);
-                    historyListAdapter.notifyDataSetChanged();
+                        mHistoryList.setAdapter(historyListAdapter);
+                        historyListAdapter.notifyDataSetChanged();
+                    }catch(NullPointerException ex){
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
